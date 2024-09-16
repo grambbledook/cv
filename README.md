@@ -21,5 +21,3 @@ pdflatex cv.tex
 
 For privacy reasons, some information such as mobile is not included in this repository.
 
-No artificial intelligence was used in the wording of the CV, although this should be apparent from the language
-anyway.
