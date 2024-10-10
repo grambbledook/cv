@@ -2,7 +2,9 @@
 
 This is my CV as code. <br> 
 
-For recruiters who have made it to this point, here is the link to my up-to-date cv: [latest.pdf](cv.pdf)  
+For recruiters who have made it to this point, here is the link to my up-to-date cv: 
+- [latest-bs.pdf](cv-bs.pdf)  - My latest CV with a touch of BS (Business Specifics).
+- [latest.pdf](cv.pdf) - Lean CV with just essentials for those who are not interested in BS. 
 
 ### Generate PDF
 
