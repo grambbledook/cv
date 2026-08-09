@@ -14,13 +14,12 @@ permissions:
 
 concurrency:
   group: build-pdf
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      PR_BRANCH: automation/rebuild-pdfs
       # Make pdflatex embed a fixed date so rebuilds only differ when content does.
       SOURCE_DATE_EPOCH: '0'
       FORCE_SOURCE_DATE: '1'
@@ -59,17 +58,15 @@ jobs:
             exit 0
           fi
 
-          git checkout -B "$PR_BRANCH"
+          PR_BRANCH="automation/rebuild-pdfs-$(date -u +%Y%m%d-%H%M%S)"
+
+          git checkout -b "$PR_BRANCH"
           git add -- '*.pdf'
           git commit -m "chore: rebuild PDFs from ${GITHUB_SHA::7}"
-          git push --force origin "$PR_BRANCH"
+          git push origin "$PR_BRANCH"
 
-          if [ -z "$(gh pr list --head "$PR_BRANCH" --state open --json number --jq '.[].number')" ]; then
-            gh pr create \
-              --base "${GITHUB_REF_NAME}" \
-              --head "$PR_BRANCH" \
-              --title 'chore: rebuild CV PDFs' \
-              --body "Regenerated from the \`.tex\` sources at ${GITHUB_SHA}."
-          else
-            echo 'Existing PR updated by the force-push.'
-          fi
+          gh pr create \
+            --base "${GITHUB_REF_NAME}" \
+            --head "$PR_BRANCH" \
+            --title "chore: rebuild CV PDFs from ${GITHUB_SHA::7}" \
+            --body "Regenerated from the \`.tex\` sources at ${GITHUB_SHA}."
