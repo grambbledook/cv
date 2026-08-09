@@ -1,0 +1,75 @@
+name: Build CV PDFs
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - '**.tex'
+      - '.github/workflows/build-pdf.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: build-pdf
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      PR_BRANCH: automation/rebuild-pdfs
+      # Make pdflatex embed a fixed date so rebuilds only differ when content does.
+      SOURCE_DATE_EPOCH: '0'
+      FORCE_SOURCE_DATE: '1'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install LaTeX
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            texlive-latex-base \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended
+
+      - name: Build PDFs
+        run: |
+          for tex in *.tex; do
+            echo "::group::$tex"
+            # Twice, so hyperref/toc references settle.
+            pdflatex -interaction=nonstopmode -halt-on-error "$tex"
+            pdflatex -interaction=nonstopmode -halt-on-error "$tex"
+            echo "::endgroup::"
+          done
+
+      - name: Open PR if PDFs changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          if git diff --quiet -- '*.pdf'; then
+            echo 'PDFs are already up to date; nothing to do.'
+            exit 0
+          fi
+
+          git checkout -B "$PR_BRANCH"
+          git add -- '*.pdf'
+          git commit -m "chore: rebuild PDFs from ${GITHUB_SHA::7}"
+          git push --force origin "$PR_BRANCH"
+
+          if [ -z "$(gh pr list --head "$PR_BRANCH" --state open --json number --jq '.[].number')" ]; then
+            gh pr create \
+              --base "${GITHUB_REF_NAME}" \
+              --head "$PR_BRANCH" \
+              --title 'chore: rebuild CV PDFs' \
+              --body "Regenerated from the \`.tex\` sources at ${GITHUB_SHA}."
+          else
+            echo 'Existing PR updated by the force-push.'
+          fi
