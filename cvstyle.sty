@@ -1,79 +1,230 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{cvstyle}[2026/08/09 Shared preamble and macros for the CV variants]
+\ProvidesPackage{cvstyle}[2026/08/11 Editorial style and macros for the CV variants]
 
-% LaTeX makes @ a letter while loading a .sty; the tabularx specs below rely on
-% @{} being read exactly as it was when these macros lived in the .tex preamble.
+%% LaTeX makes @ a letter while loading a .sty, but the tabular preambles below
+%% need @{} read as an @-expression, exactly as it would be in a .tex file.
+%% Restored at the end of the package.
 \makeatother
 
-\usepackage{fullpage}
-\usepackage{amsmath}
-\usepackage{varwidth}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\textheight=10in
-\pagestyle{empty}
-\raggedright
-\usepackage[left=0.8in,right=0.8in,bottom=0.8in,top=0.8in]{geometry}
-\usepackage[hidelinks]{hyperref}
-\usepackage{scrextend}
-\usepackage{enumitem}
-\usepackage{tabularx}
+%% ===========================================================================
+%%  Options
+%%
+%%  [prank]   the LinkedIn link leads somewhere other than LinkedIn (default)
+%%  [noprank] the LinkedIn link leads to LinkedIn
+%%
+%%  See the \linkedinurl definition at the foot of this file. Each variant
+%%  declares its own choice, so the two are never coupled by accident.
+%% ===========================================================================
+\newif\ifcvprank
+\cvpranktrue
+\DeclareOption{prank}{\cvpranktrue}
+\DeclareOption{noprank}{\cvprankfalse}
+\DeclareOption*{\PackageWarning{cvstyle}{Unknown option '\CurrentOption'}}
+\ProcessOptions\relax
 
-\hypersetup{
-    colorlinks=false,
-}
+%% ===========================================================================
+%%  Page
+%% ===========================================================================
+\RequirePackage[a4paper,
+    left=19mm, right=19mm, top=16mm, bottom=16mm,
+    footskip=8mm]{geometry}
+
+%% ===========================================================================
+%%  Fonts
+%%
+%%  XCharter carries the running text (sturdy at small sizes, old-style
+%%  figures sit inside a line instead of shouting over it); Fira Sans carries
+%%  everything that labels the text -- name, section heads, dates, locations.
+%%  Both come from texlive-fonts-extra; see .github/workflows/build-pdf.yml.
+%% ===========================================================================
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[T1]{fontenc}
+\RequirePackage[osf,scaled=1.02]{XCharter}
+\RequirePackage[scaled=0.92]{FiraSans}
+\RequirePackage{microtype}
+
+%% ===========================================================================
+%%  Palette -- one accent, one muted grey, one hairline. Nothing else.
+%% ===========================================================================
+\RequirePackage{xcolor}
+\definecolor{cvink}{HTML}{16181D}
+\definecolor{cvaccent}{HTML}{1B3A57}
+\definecolor{cvmuted}{HTML}{6B7178}
+\definecolor{cvrule}{HTML}{D5D8DC}
+
+\RequirePackage{tabularx}
+\RequirePackage{array}
+\RequirePackage{enumitem}
+\RequirePackage{ragged2e}
+\RequirePackage{needspace}
+\RequirePackage{fancyhdr}
+\RequirePackage{refcount}
+\RequirePackage{fontawesome5}
+\RequirePackage[hidelinks]{hyperref}
 \urlstyle{same}
 
-\def\bull{\vrule height 0.8ex width .7ex depth -.1ex }
+%% ===========================================================================
+%%  Text block
+%% ===========================================================================
+\color{cvink}
+\linespread{1.06}\selectfont
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+\RaggedRight              % ragged right, but still hyphenating
+\raggedbottom
+\widowpenalty=10000
+\clubpenalty=10000
 
-% DEFINITIONS FOR RESUME %%%%%%%%%%%%%%%%%%%%%%%
+%% Vertical rhythm: every gap in the document is one of these three.
+\newlength{\cvsectionsep}\setlength{\cvsectionsep}{13pt} % before a section rule
+\newlength{\cvheadsep}\setlength{\cvheadsep}{7pt}        % after a section rule
+\newlength{\cventrysep}\setlength{\cventrysep}{9pt}      % between entries
 
-\newcommand{\area} [2] {
-    \vspace*{-9pt}
-    \begin{verse}
-    \textbf{#1}   #2
-    \end{verse}
-}
+%% Named type styles, so sizes live in one place.
+\newcommand{\cvtitlefont}{\normalsize\bfseries\color{cvink}}
+\newcommand{\cvrolefont}{\normalsize\itshape\color{cvink}}
+\newcommand{\cvmetafont}{\sffamily\small\color{cvmuted}}
+\newcommand{\cvlabelfont}{\sffamily\firamedium\small\color{cvmuted}}
 
-\newcommand{\lineunder} {
-    \vspace*{-8pt} \\
-    \hspace*{-18pt} \hrulefill \\
-}
+%% ===========================================================================
+%%  Running foot -- only worth printing once the CV spills onto a second page.
+%% ===========================================================================
+\newcommand{\cvName}{}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[C]{%
+    \ifnum\getpagerefnumber{cvlastpage}>1
+        {\cvmetafont\footnotesize
+        \cvName\hspace{0.6em}\textperiodcentered\hspace{0.6em}
+        \thepage\,/\,\pageref{cvlastpage}}%
+    \fi}
 
-\newcommand{\header} [1] {
-        {\hspace*{-18pt}\vspace*{6pt} \textsc{#1}}
-    \vspace*{-6pt} \lineunder
-}
+%% ===========================================================================
+%%  Building blocks
+%% ===========================================================================
 
-\newcommand{\employer} [4] {
-    \textbf{#1} \hfill {#3} \\
-    \textit{#2} \hfill {#4} \\
-    \vspace{0mm}
-}
+%% A full-width line with content flushed to both margins. Used for every
+%% entry heading, so left and right columns can never drift apart.
+%%
+%% The \leavevmode matters: a p-column takes its baseline from the first box
+%% in the cell, and every cell here opens with a \color switch, which is a
+%% whatsit rather than a box. Without it the whole cell drops a line.
+\newcommand{\cvrow}[2]{%
+    \begingroup
+    \setlength{\tabcolsep}{0pt}%
+    \begin{tabularx}{\linewidth}{@{}>{\leavevmode\RaggedRight\arraybackslash}X@{}r@{}}
+        #1 & #2
+    \end{tabularx}%
+    \endgroup\par}
 
-\newcommand{\education} [5] {
-    \textbf{#1} \hfill {#4} \\ {#5} \\ \vspace{1mm}
-    \begin{tabularx}{\textwidth}{@{}p{3cm} X@{}}
-    \textbf{Degree:} & {#2} \\
-    \textbf{Qualification:} & {#3} \\
-    \end{tabularx}
-    \vspace{2mm}
-}
+%% Separator between contact details.
+\newcommand{\cvdot}{\hspace{0.75em}\textperiodcentered\hspace{0.75em}}
 
-\newcommand{\project} [4] {
-    \textbf{#1} \hfill {#4} \\ \vspace{1mm}
-    \begin{addmargin}[0em]{1em}
-    \begin{tabularx}{\textwidth}{@{}p{3cm} X@{}}
-    \textbf{Tools:} & {#2} \\
-    \textbf{Description:} & {#3} \\
-    \end{tabularx}
-    \end{addmargin}
-    \vspace{2mm}
-}
+%% \cvheader{Name}{Tagline}{Location} -- the rest comes from the contact
+%% details defined at the foot of this file.
+\newcommand{\cvheader}[3]{%
+    \renewcommand{\cvName}{#1}%
+    \begin{center}
+        {\sffamily\firalight\fontsize{26}{30}\selectfont\color{cvink}%
+        \textls[110]{\MakeUppercase{#1}}}\par
+        \vspace{5pt}
+        {\sffamily\small\color{cvaccent}\textls[140]{\MakeUppercase{#2}}}\par
+        \vspace{9pt}
+        {\color{cvrule}\hrule height 0.6pt}
+        \vspace{7pt}
+        {\sffamily\small\color{cvmuted}%
+        \faIcon{map-marker-alt}\hspace{0.4em}#3\cvdot
+        \faIcon{envelope}\hspace{0.4em}\href{mailto:\email}{\email}\cvdot
+        \faIcon{linkedin}\hspace{0.4em}\href{https://\linkedinurl}{\linkedin}\cvdot
+        \faIcon{github}\hspace{0.4em}\href{https://\github}{\github}}\par
+    \end{center}
+    \vspace{-2pt}}
 
+%% \header{Section name}
+\newcommand{\header}[1]{%
+    \par\addvspace{\cvsectionsep}%
+    \Needspace*{5\baselineskip}%
+    {\sffamily\firamedium\small\color{cvaccent}\textls[200]{\MakeUppercase{#1}}}\par
+    \vspace{3pt}
+    {\color{cvrule}\hrule height 0.6pt}%
+    \par\vspace{\cvheadsep}}
+
+%% \employer{Company}{Role}{Dates}{Location}
+\newcommand{\employer}[4]{%
+    \par\addvspace{\cventrysep}%
+    \Needspace*{4\baselineskip}%
+    \cvrow{\cvtitlefont #1}{\cvmetafont #3}%
+    \vspace{1pt}
+    \cvrow{\cvrolefont #2}{\cvmetafont #4}%
+    \par\vspace{1pt}}
+
+%% \education{Institution}{Degree}{Qualification}{Location}{Dates}
+\newcommand{\education}[5]{%
+    \par\addvspace{\cventrysep}%
+    \Needspace*{4\baselineskip}%
+    \cvrow{\cvtitlefont #1}{\cvmetafont #5}%
+    \vspace{1pt}
+    \cvrow{\cvrolefont #3}{\cvmetafont #4}%
+    \par\vspace{3pt}
+    {\small #2\par}}
+
+%% \project{Name}{Tools}{Description}{github.com/... (no protocol)}
+\newcommand{\project}[4]{%
+    \par\addvspace{\cventrysep}%
+    \Needspace*{4\baselineskip}%
+    \cvrow{\cvtitlefont #1}{\cvmetafont\faIcon{github}\hspace{0.45em}\href{https://#4}{#4}}%
+    \par\vspace{3pt}
+    #3\par
+    \vspace{2pt}
+    {\cvlabelfont Tools}\hspace{0.6em}{\small #2}\par}
+
+%% Opening paragraph, set a little larger and airier than the body -- the
+%% magazine standfirst that a reader skims before deciding to read on.
+\newenvironment{lede}
+    {\par\addvspace{1pt}\begingroup
+     \fontsize{10.6}{14.4}\selectfont\RaggedRight}
+    {\par\endgroup\addvspace{1pt}}
+
+%% Two-column label/value list used by the Skills block. Rows are separated by
+%% a fixed gap rather than \arraystretch, so a value that wraps onto a second
+%% line does not open up a wider gap than its neighbours.
+\newenvironment{skills}
+    {\par\addvspace{2pt}\begingroup
+     \setlength{\tabcolsep}{0pt}%
+     \tabularx{\linewidth}{@{}>{\leavevmode}p{0.20\linewidth}>{\leavevmode\RaggedRight\arraybackslash}X@{}}}
+    {\endtabularx\endgroup\par}
+\newcommand{\skill}[2]{{\cvlabelfont #1} & #2 \\[3.5pt]}
+
+%% Bullets: a small accent square, tight but not cramped.
+\setlist[itemize,1]{
+    label=\textcolor{cvaccent}{\raisebox{0.28ex}{\rule{2.4pt}{2.4pt}}},
+    leftmargin=1.2em, labelsep=0.65em,
+    topsep=3pt, itemsep=2pt, parsep=0pt, partopsep=0pt,
+    before=\RaggedRight}
+
+%% Every document ends with this: it anchors the page counter used in the foot.
+\AtEndDocument{\label{cvlastpage}}
+
+%% Contact details, written without a protocol: the macros add https:// when
+%% they build the link, and print the shorter form on the page.
 \def\email{nekto.denis.v@gmail.com}
-\def\phone{555-55-55}
+\def\github{github.com/grambbledook}
+\def\linkedin{linkedin.com/in/denis-o-vodopianov}
 
-% END RESUME DEFINITIONS %%%%%%%%%%%%%%%%%%%%%%%
+%% The LinkedIn line always *prints* \linkedin. Where it actually goes is
+%% \linkedinurl, which is where the joke lives, and which the package options
+%% at the top of this file select.
+%%
+%% Load the package [noprank] for anything that matters: the printed text is
+%% honest either way, but anything reading the link target rather than the
+%% page -- an ATS parser, a recruiter's click -- gets Rick Astley instead of a
+%% profile, and never reaches the real one. cv-full.tex is built that way.
+\ifcvprank
+    \def\linkedinurl{www.youtube.com/watch?v=dQw4w9WgXcQ}
+\else
+    \def\linkedinurl{\linkedin}
+\fi
 
+%% Hand @ back to LaTeX, as a well-behaved package should.
 \makeatletter

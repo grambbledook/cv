@@ -9,17 +9,14 @@ For recruiters who have made it to this point, here is the link to my up-to-date
 ### Generate PDF
 
 
-To install LaTeX:
+To install LaTeX (`texlive-fonts-extra` carries XCharter, Fira Sans and Font
+Awesome, which `cvstyle.sty` sets the whole CV in):
 ```sh
-apt install texlive-latex-base texlive-latex-extra
+apt install texlive-latex-base texlive-latex-recommended texlive-latex-extra \
+            texlive-fonts-recommended texlive-fonts-extra
 ```
 
-To generate PDF:
+To generate PDF (twice, so the page-count in the footer settles):
 ```bash
-pdflatex cv.tex
+pdflatex cv.tex && pdflatex cv.tex
 ```
-
-### Disclaimer
-
-For privacy reasons, some information such as mobile is not included in this repository.
-

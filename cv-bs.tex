@@ -1,67 +1,56 @@
-\documentclass[a4paper]{article}
+\documentclass[a4paper,10pt]{article}
 \usepackage{cvstyle}
 
 \begin{document}
-    \vspace*{-40pt}
-
 
 %==== Profile ====%
-    \vspace*{-10pt}
-    \begin{center}
-        \Huge \scshape {Denis O. Vodopianov} \\ \vspace{1mm}
-    \end{center}
-
-    \begin{center}
-        Berlin, Germany $\cdot$
-        \href{mailto:\email}{\email} $\cdot$
-%        \href{tel:\phone}{\phone} $\cdot$
-        \url{https://github.com/grambbledook}\\
-    \end{center}
+    \cvheader{Denis O. Vodopianov}
+    {Senior Software Engineer $\cdot$ Distributed Systems}
+    {Berlin, Germany}
 
     \header{About}
-    \begin{raggedright}
+    \begin{lede}
         Software engineer with a decade of experience specializing in distributed systems, with a focus on scalability, reliability, and performance.
         I have experience moving from monoliths to microservices to scale a business and back to microliths
-        to optimize cost and performance. \break
+        to optimize cost and performance.
+
+        \vspace{5pt}
 
         I enjoy solving various system problems as well as low-level algorithmic challenges.
-        My key strengths include analytical thinking, empathy, a strong bias for action, ownership, and a focus on customer needs. \\
-    \end{raggedright}
-    \vspace{2mm}
+        My key strengths include analytical thinking, empathy, a strong bias for action, ownership, and a focus on customer needs.
+    \end{lede}
 
     \header{Skills}
-    \begin{tabularx}{\textwidth}{p{5cm} X}
-        Programming Languages: & Kotlin, Java, Scala, Python, Go, Typescript                                                                     \\
-        Web Frameworks:        & Spring Boot, Vert.x, Netty, Play, Express.js                                                                    \\
-        DevOps:                & Docker, Kubernetes, Terraform, Ansible, Jenkins, Gitlab CI/CD, Argo CD, Datadog, ELK stack, Grafana, Prometheus \\
-        Databases:             & Postgres, Mongo, DynamoDB, Cassandra, Redis                                                                     \\
-        Networking:            & TCP/IP, HTTPS, WebSockets                                                                                       \\
-        Big Data:              & Hadoop, Hive, Pig, Hbase, Clickhouse, Storm, Spark, Airflow                                                     \\
-    \end{tabularx}
-    \vspace{2mm}
+    \begin{skills}
+        \skill{Languages}{Kotlin, Java, Scala, Python, Go, Typescript}
+        \skill{Web Frameworks}{Spring Boot, Vert.x, Netty, Play, Express.js}
+        \skill{DevOps}{Docker, Kubernetes, Terraform, Ansible, Jenkins, Gitlab CI/CD, Argo CD, Datadog, ELK stack, Grafana, Prometheus}
+        \skill{Databases}{Postgres, Mongo, DynamoDB, Cassandra, Redis}
+        \skill{Networking}{TCP/IP, HTTPS, WebSockets}
+        \skill{Big Data}{Hadoop, Hive, Pig, Hbase, Clickhouse, Storm, Spark, Airflow}
+    \end{skills}
 
 
 %==== Experience ====%
     \header{Work Experience}
-    \vspace{1mm}
 
-    \employer{Grafana Labs}{Senior Software Engineer}{March 2025 - Now}{Berlin, Germany}
-    \begin{itemize}[itemsep=-1mm]
+    \employer{Grafana Labs}{Senior Software Engineer}{March 2025 -- Now}{Berlin, Germany}
+    \begin{itemize}
         \item In charge of Cloud Grafana.
         \item Automated the release process so OSS, Enterprise, and Cloud customers get new versions
         and security patches on schedule, saving dozens of engineering hours per release.
     \end{itemize}
 
-    \employer{Trade Republic Bank}{Senior Software Engineer}{October 2023 - April 2024}{Berlin, Germany}
-    \begin{itemize}[itemsep=-1mm]
+    \employer{Trade Republic Bank}{Senior Software Engineer}{October 2023 -- April 2024}{Berlin, Germany}
+    \begin{itemize}
         \item Was in charge of the system responsible for user accounts and balances, focusing on correctness, low latency, and high availability.
         \item Joined the task force team, resolved several integration issues, and delivered a system required to launch the Cards product within the projected timeframe.
         \item Identified hotspots and reduced the 95th percentile response latency from 20 ms to 5 ms.
         \item Delivered a reconciliation system processing 150 million transactions daily to ensure data consistency across different banking systems.
     \end{itemize}
 
-    \employer{Picsart}{Senior Software Engineer II (Lead developer)}{January 2022 - March 2023}{Berlin, Germany}
-    \begin{itemize}[itemsep=-1mm]
+    \employer{Picsart}{Senior Software Engineer II (Lead developer)}{January 2022 -- March 2023}{Berlin, Germany}
+    \begin{itemize}
         \item The team had full ownership of the user tracking component in the analytics platform, processing billions
         of events per day and reaching 200k eps at peak load.
         \item Optimized the event ingestion component, reducing fleet size by 40\% and freeing up resources for new projects.
@@ -79,8 +68,8 @@
         saving hundreds of thousands of dollars per year.
     \end{itemize}
 
-    \employer{N26 GmbH}{Senior Software Engineer, Acting Tech Lead}{March 2020 - January 2022}{Berlin, Germany}
-    \begin{itemize}[itemsep=-1mm]
+    \employer{N26 GmbH}{Senior Software Engineer, Acting Tech Lead}{March 2020 -- January 2022}{Berlin, Germany}
+    \begin{itemize}
         \item The team had full ownership of the identity platform with a strong focus on security, scalability, reliability, and compliance.
         \item Implemented strong customer authentication to achieve full compliance with PSD2.
         \item Designed and implemented several foundational authentication mechanisms for product teams to use across various N26 products.
@@ -90,8 +79,8 @@
         incorporated valuable insights to enhance the security of the identity platform.
     \end{itemize}
 
-    \employer{Freelance, Contractor}{Lead Software Engineer at Plutus.ai}{November 2018 - February 2020}{Saint–Petersburg, Russia}
-    \begin{itemize}[itemsep=-1mm]
+    \employer{Freelance, Contractor}{Lead Software Engineer at Plutus.ai}{November 2018 -- February 2020}{Saint Petersburg, Russia}
+    \begin{itemize}
         \item Led a team of 5 engineers to deliver a casual crypto portfolio with near real-time market data, daily challenges, and social elements.
         \item Quickly identified and resolved system scalability issues to meet the demands of a growing client base, ensuring the system could handle increased workloads and support future growth.
         \item Delivered a strategic initiative to enhance internal gamification mechanics by providing near real-time dashboards, leaderboards,
@@ -100,8 +89,8 @@
         Reduced integration time and effort and enabling the organization to rapidly expand its network of partners and market coverage.
     \end{itemize}
 
-%    \employer{Nexign Systems}{Lead Software Engineer}{August 2017 - September 2018}{Saint–Petersburg, Russia}
-%    \begin{itemize}[itemsep=-1mm]
+%    \employer{Nexign Systems}{Lead Software Engineer}{August 2017 -- September 2018}{Saint Petersburg, Russia}
+%    \begin{itemize}
 %        \item Led the development and testing processes in a team of 7 engineers, ensured seamless execution
 %        and delivery of software updates, minimising downtime and service disruptions.
 %        \item Worked closely with the product team to execute a successful legacy PRM system refresh aiming cloud deployment and
@@ -110,8 +99,8 @@
 %        performance and ensuring its ability to handle increasing loads at peak usage periods.
 %    \end{itemize}
 %
-%    \employer{Contractor, multiple clients}{Senior Software/Data Engineer}{June 2014 - August 2017}{Saint–Petersburg, Russia}
-%    \begin{itemize}[itemsep=-1mm]
+%    \employer{Contractor, multiple clients}{Senior Software/Data Engineer}{June 2014 -- August 2017}{Saint Petersburg, Russia}
+%    \begin{itemize}
 %        \item Developed a trusted relationship with senior leadership at a client specialising in the analysis of digital advertising
 %        placements, fostered a strong partnership that resulted in improved collaboration, alignment of goals, and enhanced client
 %        satisfaction
@@ -120,8 +109,8 @@
 %        models performance and accuracy.
 %    \end{itemize}
 %
-%    \employer{Oracle}{Software Developer in Test, Java JDK}{November 2012 - June 2014}{Saint-Petersburg, Russia}
-%    \begin{itemize}[itemsep=-1mm]
+%    \employer{Oracle}{Software Developer in Test, Java JDK}{November 2012 -- June 2014}{Saint Petersburg, Russia}
+%    \begin{itemize}
 %        \item Designing comprehensive tests for multiple features including potential and real security vulnerabilities.
 %        \item Improved stability and performance of the testing framework, enhancing overall productivity and reliability
 %        in the testing process.
@@ -129,8 +118,8 @@
 %        generation, resulting in improved efficiency and accuracy in bug triaging and resolution
 %    \end{itemize}
 
-    \employer{Multiple companies}{(Senior) Software Engineer}{May 2012 - November 2018}{Saint-Petersburg, Russia}
-    \begin{itemize}[itemsep=-1mm]
+    \employer{Multiple companies}{(Senior) Software Engineer}{May 2012 -- November 2018}{Saint Petersburg, Russia}
+    \begin{itemize}
         \item Started career at a small ad startup, implemented several statistical models to improve CTR for ad campaigns.
         \item Joined the Java Test division at Oracle and helped release Java 8 and multiple Java 6/7 versions.
         \item Successfully delivered product features in various projects in ad tech, telecom, and fintech fields.
@@ -142,16 +131,16 @@
     \education{ITMO University}
     {Master’s degree in Optical Electronic Devices and Systems with specialisation in Optical-Electronic Devices and Systems for Video Information Processing}
     {Engineer}
-    {Saint–Petersburg, Russia}
-    {September 2004 - February 2010}
+    {Saint Petersburg, Russia}
+    {September 2004 -- February 2010}
 
 
 %==== Notable Projects ====%
     \header{Projects}
-    \project{\textbf Indoor cycling HUD}
+    \project{Indoor Cycling HUD}
     {C++, Bluetooth Low Energy, QT, sqlite, CMake, vcpkg}
-    {An overlay app that aggregates data coming from BLE devices and renders workout statistics on the heads up display}
-    {https://github.com/grambbledook/indoor-cycling-hud}
+    {An overlay app that aggregates data coming from BLE devices and renders workout statistics on the heads up display.}
+    {github.com/grambbledook/indoor-cycling-hud}
 %
 %    \project{Identity platform for a challenger bank}
 %    {Kotlin, Java, AWS, Terraform, Kubernetes, Redis, Kafka, Go.}

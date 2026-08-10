@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
       - '**.tex'
+      - '**.sty'
       - '.github/workflows/build-pdf.yml'
   workflow_dispatch:
 
@@ -34,7 +35,8 @@ jobs:
             texlive-latex-base \
             texlive-latex-recommended \
             texlive-latex-extra \
-            texlive-fonts-recommended
+            texlive-fonts-recommended \
+            texlive-fonts-extra
 
       - name: Build PDFs
         run: |
@@ -45,6 +47,34 @@ jobs:
             pdflatex -interaction=nonstopmode -halt-on-error "$tex"
             echo "::endgroup::"
           done
+
+      - name: Check cv-full.pdf links only where it claims to
+        run: |
+          python3 - <<'PY'
+          import re, sys, zlib
+
+          # Link targets live in annotation dictionaries, which pdflatex may
+          # bury inside compressed object streams -- so inflate everything.
+          data = open('cv-full.pdf', 'rb').read()
+          uris = set(re.findall(rb'/URI\s*\((.*?)\)', data))
+          for stream in re.finditer(rb'stream\r?\n(.*?)endstream', data, re.S):
+              try:
+                  uris |= set(re.findall(rb'/URI\s*\((.*?)\)',
+                                         zlib.decompress(stream.group(1))))
+              except zlib.error:
+                  pass
+
+          uris = sorted(u.decode('latin-1') for u in uris)
+          print('cv-full.pdf link targets:')
+          for u in uris:
+              print(' ', u)
+
+          expected = ('mailto:', 'https://linkedin.com/', 'https://github.com/')
+          unexpected = [u for u in uris if not u.startswith(expected)]
+          if unexpected or not any(u.startswith('https://linkedin.com/') for u in uris):
+              sys.exit('cv-full.pdf must ship with real links only; got: %s'
+                       % (unexpected or 'no LinkedIn link at all'))
+          PY
 
       - name: Open PR if PDFs changed
         env:
